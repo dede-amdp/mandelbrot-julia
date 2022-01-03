@@ -1,0 +1,21 @@
+* {
+  font-family: monospace;
+}
+canvas {
+  padding: 0;
+  margin: auto;
+  display: block;
+}
+
+canvas:hover {
+  cursor: crosshair;
+}
+
+.cursor-text {
+  position: absolute;
+  color: white;
+}
+
+.instagram {
+  color: white;
+}
