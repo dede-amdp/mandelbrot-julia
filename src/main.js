@@ -122,3 +122,13 @@ canvas.onclick = (e) => {
     let pos = fromUV(r, i, remin, remax, immin, immax);
     julia(canvas, new Complex(pos.r, pos.i), remin, remax, immin, immax);
 }
+
+
+
+
+
+
+
+
+
+// made by @dedeartbit (on instagram) 20220103
