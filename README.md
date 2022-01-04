@@ -11,4 +11,4 @@ The Options button lets the user modify the colors of the sets and the exponent 
 
 Lastly, the Save Button lets the user save the image shown.
 
-Project made by @dedeartbit (on instagram)
+Project made by @dede.artbit (on instagram)
