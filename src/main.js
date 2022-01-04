@@ -44,10 +44,11 @@ canvas: reference to the canvas where the image will be drawn;
 remin, immin: real and imaginary minima;
 remax, immax: real and imaginary maxima;
 step: precision;
-outsideColor, insideColor: colors that will be shown inside and outside the mandelbrot set.
+outsideColor, insideColor: colors that will be shown inside and outside the mandelbrot set;
+me: Multibrot exponent.
 Check: https://en.wikipedia.org/wiki/Mandelbrot_set
 ____________________________________*/
-async function mandelbrot(canvas, remin, remax, immin, immax, outsideColor = '#000000', insideColor = '#8EF7F7') {
+async function mandelbrot(canvas, remin, remax, immin, immax, outsideColor = '#000000', insideColor = '#8EF7F7', me = 2) {
     let w = canvas.width;
     let h = canvas.height;
     let max_iterations = 100;
@@ -57,7 +58,7 @@ async function mandelbrot(canvas, remin, remax, immin, immax, outsideColor = '#0
         for (let y = 0; y < h; y++) {
             let pos = fromUV(x / w, y / h, remin, remax, immin, immax);
             z = new Complex(pos.r, pos.i);
-            div = diverges(new Complex(0, 0), z, 2, max_iterations);
+            div = diverges(new Complex(0, 0), z, me, max_iterations);
             // choose color based on the iteration on which the series started diverging
             let color = mapColor(div.intensity / max_iterations, ...hexToRgb(outsideColor), ...hexToRgb(insideColor));
             with (ctx) {
@@ -77,10 +78,11 @@ canvas: HTMLElement on which the picture will be drawn;
 c: number to use for the julia set;
 remin, immin: real and imaginary minima;
 remax, immax: real and immaginary maxima;
-outsideColor, insideColor: colors that will be shown inside and outside the julia set.
+outsideColor, insideColor: colors that will be shown inside and outside the julia set;
+me: Multibrot Exponent.
 Check: https://en.wikipedia.org/wiki/Julia_set
 _______________________________________________*/
-async function julia(canvas, c, remin, remax, immin, immax, outsideColor = '#000000', insideColor = '#8EF7F7') {
+async function julia(canvas, c, remin, remax, immin, immax, outsideColor = '#000000', insideColor = '#8EF7F7', me = 2) {
     let w = canvas.width;
     let h = canvas.height;
     let max_iterations = 75;
@@ -90,7 +92,7 @@ async function julia(canvas, c, remin, remax, immin, immax, outsideColor = '#000
         for (let y = 0; y < h; y++) {
             let pos = fromUV(x / w, y / h, remin, remax, immin, immax);
             z = new Complex(pos.r, pos.i);
-            div = diverges(z, c, 2, max_iterations);
+            div = diverges(z, c, me, max_iterations);
             // choose color based on the iteration on which the series started diverging
             let color = mapColor(div.intensity / max_iterations, ...hexToRgb(outsideColor), ...hexToRgb(insideColor));
             with (ctx) {
@@ -169,7 +171,7 @@ function init() {
     env.style.setProperty('--outside-color', outsideColor);
     env.style.setProperty('--inside-color', insideColor);
     env.style.setProperty('--button-color', invertHex(outsideColor));
-    mandelbrot(canvas, remin, remax, immin, immax, outsideColor, insideColor); // start by drawing the mandelbrot set
+    mandelbrot(canvas, remin, remax, immin, immax, outsideColor, insideColor, exponentExp.value); // start by drawing the mandelbrot set
 }
 
 
@@ -188,6 +190,7 @@ var mbutton, obutton, closebutton, colorbutton, sbutton
     document.getElementById('color-button'),
     document.getElementById('save-button')
 ];
+var exponentExp = document.getElementById('multibrot-exponent');
 
 let size = Math.min(window.innerWidth, window.innerHeight); // calculate size of the canvas
 canvas.width = size;
@@ -209,9 +212,9 @@ canvas.onclick = (e) => {
     let r = (e.clientX - canvas_rect.left) / canvas.width;
     let i = (e.clientY - canvas_rect.top) / canvas.height;
     let pos = fromUV(r, i, remin, remax, immin, immax);
-    julia(canvas, new Complex(pos.r, pos.i), remin, remax, immin, immax, outsideColor, insideColor);
+    julia(canvas, new Complex(pos.r, pos.i), remin, remax, immin, immax, outsideColor, insideColor, exponentExp.value);
 };
-mbutton.onclick = (e) => mandelbrot(canvas, remin, remax, immin, immax, outsideColor, insideColor);
+mbutton.onclick = (e) => mandelbrot(canvas, remin, remax, immin, immax, outsideColor, insideColor, exponentExp.value);
 obutton.onclick = (e) => { optionsMenu.style.display = 'block'; };
 closebutton.onclick = (e) => { optionsMenu.style.display = 'none'; };
 colorbutton.onclick = changeColor;
