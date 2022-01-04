@@ -41,11 +41,11 @@ remax, immax: real and imaginary maxima;
 step: precision;
 outsideColor, insideColor: colors that will be shown inside and outside the mandelbrot set.
 ____________________________________*/
-function mandelbrot(canvas, remin, remax, immin, immax, outsideColor = [255, 255, 255], insideColor = [142, 247, 247]) {
+async function mandelbrot(canvas, remin, remax, immin, immax, outsideColor = '#000000', insideColor = '#8EF7F7') {
     let w = canvas.width;
     let h = canvas.height;
     let max_iterations = 100;
-    document.body.style.backgroundColor = `rgb(${outsideColor.toString().replace({ '[': '', ']': '' })})`;
+    document.body.style.backgroundColor = `${outsideColor}`;
     let ctx = canvas.getContext('2d');
     for (let x = 0; x < w; x++) {
         for (let y = 0; y < h; y++) {
@@ -53,7 +53,7 @@ function mandelbrot(canvas, remin, remax, immin, immax, outsideColor = [255, 255
             z = new Complex(pos.r, pos.i);
             div = diverges(new Complex(0, 0), z, 2, max_iterations);
             // choose color based on the iteration on which the series started diverging
-            let color = mapColor(div.intensity / max_iterations, ...outsideColor, ...insideColor);
+            let color = mapColor(div.intensity / max_iterations, ...hexToRgb(outsideColor), ...hexToRgb(insideColor));
             with (ctx) {
                 // draw the pixel on the canvas
                 fillStyle = color;
@@ -73,14 +73,50 @@ remin, immin: real and imaginary minima;
 remax, immax: real and immaginary maxima;
 outsideColor, insideColor: colors that will be shown inside and outside the julia set.
 _______________________________________________*/
-function julia(canvas, c, remin, remax, immin, immax, outsideColor = [255, 255, 255], insideColor = [142, 247, 247]) {
+async function julia(canvas, c, remin, remax, immin, immax, outsideColor = '#000000', insideColor = '#8EF7F7') {
     console.log(c);
-    return null // TODO IMPLEMENT THIS FUNCTION
+    let w = canvas.width;
+    let h = canvas.height;
+    let max_iterations = 75;
+    document.body.style.backgroundColor = `${outsideColor}`;
+    let ctx = canvas.getContext('2d');
+    for (let x = 0; x < w; x++) {
+        for (let y = 0; y < h; y++) {
+            let pos = fromUV(x / w, y / h, remin, remax, immin, immax);
+            z = new Complex(pos.r, pos.i);
+            div = diverges(z, c, 2, max_iterations);
+            // choose color based on the iteration on which the series started diverging
+            let color = mapColor(div.intensity / max_iterations, ...hexToRgb(outsideColor), ...hexToRgb(insideColor));
+            with (ctx) {
+                // draw the pixel on the canvas
+                fillStyle = color;
+                fillRect(x, y, 1, 1);
+                stroke();
+            }
+        }
+    }
 }
 
 
 
+// coverts hex color to rgb
+function hexToRgb(hex) {
+    let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); // use regex
+    return result ? [
+        parseInt(result[1], 16), //r
+        parseInt(result[2], 16), //g
+        parseInt(result[3], 16) //b
+    ] : [0, 0, 0];
+}
 
+// Changes the colors of the page:
+function changeColor(e) {
+    optionsMenu.style.display = 'none';
+    insideColor = document.getElementById('inside-color').value;
+    outsideColor = document.getElementById('outside-color').value;
+    document.getElementById('mandelbrot-button')
+    init();
+}
 
 // Show Text Near Mouse:
 function showText(e) {
@@ -96,36 +132,51 @@ function showText(e) {
     cursorDiv.style.top = `${y}px`;
 }
 
+function init() {
+    // initializes the colors of the images
+    let env = document.querySelector('html');
+    env.style.setProperty('--outside-color', outsideColor);
+    env.style.setProperty('--inside-color', insideColor);
+    mandelbrot(canvas, remin, remax, immin, immax, outsideColor, insideColor); // start by drawing the mandelbrot set
+}
+
 
 
 //*________________________MAIN________________________*
-let canvas = document.getElementById('display');
+
+var canvas = document.getElementById('display');
+var optionsMenu = document.getElementById('options-menu');
 let size = Math.min(window.innerWidth, window.innerHeight); // calculate size of the canvas
 canvas.width = size;
 canvas.height = size;
 
 // real and imaginary axis sizes
-let remin = -2;
-let immin = -1.5;
-let remax = +1.5;
-let immax = +1.5;
-mandelbrot(canvas, remin, remax, immin, immax, [0, 0, 0]); // start by drawing the mandelbrot set
+let remin = -2.0;
+let immin = -2.0;
+let remax = +2.0;
+let immax = +2.0;
+var insideColor = '#8EF7F7';
+var outsideColor = '#000000';
+
 
 var cursorDiv = document.getElementById('show-complex'); // this div shows the complex number near the cursor
-canvas.onmousemove = showText;
 
+
+canvas.onmousemove = showText;
 // show the julia set of the corresponding complex number when clicking on the canvas
 canvas.onclick = (e) => {
     let canvas_rect = canvas.getBoundingClientRect();
     let r = (e.clientX - canvas_rect.left) / canvas.width;
     let i = (e.clientY - canvas_rect.top) / canvas.height;
     let pos = fromUV(r, i, remin, remax, immin, immax);
-    julia(canvas, new Complex(pos.r, pos.i), remin, remax, immin, immax);
-}
+    julia(canvas, new Complex(pos.r, pos.i), remin, remax, immin, immax, outsideColor, insideColor);
+};
+document.getElementById('mandelbrot-button').onclick = (e) => { mandelbrot(canvas, remin, remax, immin, immax, outsideColor, insideColor); }
+document.getElementById('options-button').onclick = (e) => { optionsMenu.style.display = 'block'; };
+document.getElementById('close-button').onclick = (e) => { optionsMenu.style.display = 'none'; };
+document.getElementById('color-button').onclick = changeColor;
 
-
-
-
+init()
 
 
 
