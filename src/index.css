@@ -1,6 +1,13 @@
 * {
   font-family: monospace;
 }
+
+html {
+  --outside-color: #000000;
+  --inside-color: #8ef7f7;
+  --button-color: #ffffff;
+}
+
 canvas {
   padding: 0;
   margin: auto;
@@ -13,9 +20,69 @@ canvas:hover {
 
 .cursor-text {
   position: absolute;
-  color: white;
+  color: var(--button-color);
 }
 
 .instagram {
-  color: white;
+  color: var(--button-color);
+}
+
+.save-button,
+.options-button,
+.home-button {
+  color: var(--button-color);
+  background-color: var(--outside-color);
+  border: none;
+  cursor: pointer;
+  font-size: xx-large;
+}
+.save-button:hover,
+.options-button:hover,
+.home-button:hover {
+  color: var(--inside-color);
+}
+
+ul {
+  list-style-type: none;
+  position: absolute;
+  padding: unset;
+}
+
+#options-menu {
+  z-index: 1000;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: auto;
+  padding: auto;
+  background-color: #ffffff22;
+}
+
+.menu {
+  position: absolute;
+  padding: 1%;
+  display: block;
+  background-color: white;
+  border-radius: 20px;
+}
+
+.color-pickers {
+  text-align: center;
+  border: none;
+  padding: 0;
+  display: block;
+}
+
+.color-button,
+#close-button {
+  border: none;
+  background-color: transparent;
+  color: black;
+  font-size: large;
+}
+.color-button:hover,
+#close-button:hover {
+  cursor: pointer;
 }

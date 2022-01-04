@@ -3,12 +3,42 @@
 
 <head>
     <link href='./src/index.css' rel='stylesheet'>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 </head>
 
 <body>
+    <a id='save-link' style='display:none'></a>
+    <ul>
+        <li><button id='mandelbrot-button' class='home-button'><i class="fa fa-home"
+                    title='Show Mandelbrot'></i></button>
+        </li>
+        <li><button id='options-button' class='options-button'><i class="fa fa-ellipsis-h"
+                    title='Show Options'></i></button></li>
+        <li><button id='save-button' class='save-button'><i class="fa fa-save" title='Save Image'></i></button>
+        </li>
+    </ul>
     <canvas id='display'></canvas>
     <div id='show-complex' class='cursor-text'></div>
     <p class='instagram'>@dedeartbit</p>
+    <div style='display:none' id='options-menu'>
+        <div id='menu' , class='menu'>
+            <button title='Close Options Menu' id='close-button'>
+                <i class='fa fa-times'></i></button>
+            <h2>Choose your own Palette:</h2>
+            <table class='color-pickers'>
+                <tr>
+                    <td>Outside Color:</td>
+                    <td><input type='color' id='outside-color' value='#000000'></td>
+                </tr>
+                <tr>
+                    <td>Inside Color:</td>
+                    <td><input type='color' id='inside-color' value='#8EF7F7'></td>
+                </tr>
+            </table>
+            <button title='Change Colors' id='color-button' class='color-button'>
+                <i class='fa fa-check'></i></button>
+        </div>
+    </div>
 </body>
 <script src='./src/Complex.js'></script>
 <script src='./src/main.js'></script>

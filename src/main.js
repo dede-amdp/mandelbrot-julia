@@ -5,7 +5,6 @@ c : added number;
 e : exponent of the complex number z; 
 When used for the mandelbrot set, different exponents e will result in different symmetries of the set.
 These new sets are colled "Multibrot sets".
-Check: https://en.wikipedia.org/wiki/Mandelbrot_set
 _________________________________*/
 function diverges(z, c, e = 2, max_iterations = 100) {
     zz = z;
@@ -19,13 +18,19 @@ function diverges(z, c, e = 2, max_iterations = 100) {
     return { 'diverges': count < max_iterations, 'intensity': count };
 }
 
+// the following function maps uv coordinates into the real and imaginary parts of a complex number
 function fromUV(u, v, remin, remax, immin, immax) {
     // maps r and i values between 0 and 1
     return { 'r': u * (remax - remin) + remin, 'i': (1 - v) * (immax - immin) + immin };
 }
 
+/*_________________________
+The following function maps a value to a range of colors:
+v: value to map;
+r1, g1, b1: rgb color that will be shown otside the sets;
+r2, g2, b2: rgb color that will be shown inside the sets;
+_________________________*/
 function mapColor(v, r1, g1, b1, r2 = 255, g2 = 255, b2 = 255) {
-    // maps value to a range of colors:
     // the first set of numbers maps to what is outside the set, the second to what is inside the set
     let nr = r1 + (r2 - r1) * v;
     let nb = b1 + (b2 - b1) * v;
@@ -40,6 +45,7 @@ remin, immin: real and imaginary minima;
 remax, immax: real and imaginary maxima;
 step: precision;
 outsideColor, insideColor: colors that will be shown inside and outside the mandelbrot set.
+Check: https://en.wikipedia.org/wiki/Mandelbrot_set
 ____________________________________*/
 async function mandelbrot(canvas, remin, remax, immin, immax, outsideColor = '#000000', insideColor = '#8EF7F7') {
     let w = canvas.width;
@@ -72,9 +78,9 @@ c: number to use for the julia set;
 remin, immin: real and imaginary minima;
 remax, immax: real and immaginary maxima;
 outsideColor, insideColor: colors that will be shown inside and outside the julia set.
+Check: https://en.wikipedia.org/wiki/Julia_set
 _______________________________________________*/
 async function julia(canvas, c, remin, remax, immin, immax, outsideColor = '#000000', insideColor = '#8EF7F7') {
-    console.log(c);
     let w = canvas.width;
     let h = canvas.height;
     let max_iterations = 75;
@@ -99,7 +105,7 @@ async function julia(canvas, c, remin, remax, immin, immax, outsideColor = '#000
 
 
 
-// coverts hex color to rgb
+// the following function converts hex color to rgb
 function hexToRgb(hex) {
     let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex); // use regex
     return result ? [
@@ -109,16 +115,33 @@ function hexToRgb(hex) {
     ] : [0, 0, 0];
 }
 
-// Changes the colors of the page:
-function changeColor(e) {
-    optionsMenu.style.display = 'none';
+// the following function inverts a hex color
+function invertHex(hex) {
+    let rgb = hexToRgb(hex);
+    rgb.forEach((i, k) => rgb[k] = 255 - i);
+    return rgbToHex(...rgb);
+}
+
+// the following function converts rgb to hex
+function rgbToHex(r, g, b) {
+    let hexr = r.toString(16);
+    hexr = hexr.length == 1 ? "0" + hexr : hexr;
+    let hexg = g.toString(16);
+    hexg = hexg.length == 1 ? "0" + hexg : hexg;
+    let hexb = b.toString(16);
+    hexb = hexb.length == 1 ? "0" + hexb : hexb;
+    return '#' + hexr + hexg + hexb;
+}
+
+// The following function changes the colors of the page:
+async function changeColor(e) {
+    closebutton.click();
     insideColor = document.getElementById('inside-color').value;
     outsideColor = document.getElementById('outside-color').value;
-    document.getElementById('mandelbrot-button')
     init();
 }
 
-// Show Text Near Mouse:
+// The following function shows text near the cursor:
 function showText(e) {
     let offset = [cursorDiv.offsetWidth, cursorDiv.offsetHeight]; // get the offset of the div showing the text
     let x = (e.clientX - offset[0]); // calculate position of themouse relative to the div
@@ -132,11 +155,20 @@ function showText(e) {
     cursorDiv.style.top = `${y}px`;
 }
 
+// The following function saves the canvas image
+async function save(canvas, name, ext) {
+    saveLink.setAttribute('download', `${name}.${ext}`);
+    saveLink.setAttribute('href', canvas.toDataURL("image/png").replace("image/png", "image/octet-stream"));
+    saveLink.click();
+}
+
+// The following function initializes the enviroment
 function init() {
     // initializes the colors of the images
     let env = document.querySelector('html');
     env.style.setProperty('--outside-color', outsideColor);
     env.style.setProperty('--inside-color', insideColor);
+    env.style.setProperty('--button-color', invertHex(outsideColor));
     mandelbrot(canvas, remin, remax, immin, immax, outsideColor, insideColor); // start by drawing the mandelbrot set
 }
 
@@ -146,6 +178,17 @@ function init() {
 
 var canvas = document.getElementById('display');
 var optionsMenu = document.getElementById('options-menu');
+var cursorDiv = document.getElementById('show-complex'); // this div shows the complex number near the cursor
+var saveLink = document.getElementById('save-link');
+var mbutton, obutton, closebutton, colorbutton, sbutton
+[mbutton, obutton, closebutton, colorbutton, sbutton] = [
+    document.getElementById('mandelbrot-button'),
+    document.getElementById('options-button'),
+    document.getElementById('close-button'),
+    document.getElementById('color-button'),
+    document.getElementById('save-button')
+];
+
 let size = Math.min(window.innerWidth, window.innerHeight); // calculate size of the canvas
 canvas.width = size;
 canvas.height = size;
@@ -159,9 +202,6 @@ var insideColor = '#8EF7F7';
 var outsideColor = '#000000';
 
 
-var cursorDiv = document.getElementById('show-complex'); // this div shows the complex number near the cursor
-
-
 canvas.onmousemove = showText;
 // show the julia set of the corresponding complex number when clicking on the canvas
 canvas.onclick = (e) => {
@@ -171,11 +211,11 @@ canvas.onclick = (e) => {
     let pos = fromUV(r, i, remin, remax, immin, immax);
     julia(canvas, new Complex(pos.r, pos.i), remin, remax, immin, immax, outsideColor, insideColor);
 };
-document.getElementById('mandelbrot-button').onclick = (e) => { mandelbrot(canvas, remin, remax, immin, immax, outsideColor, insideColor); }
-document.getElementById('options-button').onclick = (e) => { optionsMenu.style.display = 'block'; };
-document.getElementById('close-button').onclick = (e) => { optionsMenu.style.display = 'none'; };
-document.getElementById('color-button').onclick = changeColor;
-
+mbutton.onclick = (e) => mandelbrot(canvas, remin, remax, immin, immax, outsideColor, insideColor);
+obutton.onclick = (e) => { optionsMenu.style.display = 'block'; };
+closebutton.onclick = (e) => { optionsMenu.style.display = 'none'; };
+colorbutton.onclick = changeColor;
+sbutton.onclick = (e) => save(canvas, 'mandelbrot-julia', 'png');
 init()
 
 
