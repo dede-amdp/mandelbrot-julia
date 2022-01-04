@@ -1,4 +1,4 @@
-# mandelbrot-julia
+# Mandelbrot-Julia Sets
 
 This small website shows (in a simplified way) the Mandelbrot and Julia sets.
 ![website](./images/website_home.png)
